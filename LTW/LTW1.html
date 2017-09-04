@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>LTW1</title>
+    <script type="text/javascript" src="js/phaser.min.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <script type="text/javascript">
+        //Erstellen einer neuen Phaser-Instanz
+        var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+
+        function preload() {
+            //Vorausladen aller Assets
+            game.load.image('Red', 'assets/RedSquare.png');
+            game.load.image('Blue', 'assets/BlueCircle.png');
+            game.load.image('Purple', 'assets/PurpleMulti.png');
+            game.load.image('Background', 'assets/Background2.png');
+            game.load.image('Wall', 'assets/RedBarV.png');
+            game.load.image('Ground', 'assets/RedBar.png');
+            game.load.image('StartGoal', 'assets/Goal.png');
+            game.load.image('Waypoint', 'assets/Waypoint.png');
+            game.load.image('Tower1', 'assets/Tower1.png');
+            game.load.image('Startbutton', 'assets/Startbutton.png');
+            game.load.image('Life', 'assets/Life.png');
+            game.load.image('bflost', 'assets/bflost.png');
+            game.load.image('bullet', 'assets/bullet.png');
+
+            game.load.audio('Explosion', 'assets/Explosion.mp3');
+            game.load.audio('Towershot', 'assets/Towershot.mp3');
+
+            game.stage.disableVisibilityChange = true;
+        }
+
+        var Mobs;
+        var Walls;
+        var StartGoal, goal, start;
+        var Startbutton;
+        var i;
+        var Lifes, gameLost, bflost;
+        var fireRate = 100;
+        var nextFire = 0;
+        var Towers;
+        var tower1;
+        var bullets;
+        var score = 0;
+        var scoreText;
+
+        var explosion;
+        var towershot;
+
+
+        var waypointUp;
+        var waypointRight;
+        var waypointLeft;
+
+        function create() {
+
+            game.physics.startSystem(Phaser.Physics.ARCADE);
+
+            // Background
+            game.add.sprite(0, 0, 'Background');
+
+            //  The score
+            scoreText = game.add.text(32, 29, 'Test', { fontSize: '32px', fill: '#00FF00' });
+
+            // Walls & Ground
+            Walls = game.add.group();
+
+            Walls.enableBody = true;
+            // Ground
+            var ground = Walls.create(0, game.world.height - 32, 'Ground');
+
+            ground.scale.setTo(2, 2);
+
+            // Ceiling
+            var ceiling = Walls.create(0, 0, 'Ground');
+            ceiling.scale.setTo(2, 1);
+
+            //Sidewalls
+            var sidewalls = Walls.create(770, 0, 'Wall');
+            sidewalls.scale.setTo(1, 2);
+
+            sidewalls = Walls.create(0, 0, 'Wall');
+            sidewalls.scale.setTo(1, 2);
+
+            //Midwalls
+            var midwall = Walls.create(250, 400, 'Ground');
+            midwall.scale.setTo(1.5, 1)
+
+            midwall = Walls.create(0, 300, 'Ground');
+            midwall.scale.setTo(1.5, 1);
+
+            midwall = Walls.create(250, 200, 'Ground');
+            midwall.scale.setTo(1.5, 1);
+
+            //StartGoal and Startline
+            StartGoal = game.add.group();
+            StartGoal.enableBody = true;
+
+            goal = StartGoal.create(700, 80, 'StartGoal');
+
+            start = StartGoal.create(700, 470, 'StartGoal');
+
+            //Waypoints
+
+            WaypointUp = game.add.group();
+
+            WaypointUp.enableBody = true;
+
+            var waypointUp1 = WaypointUp.create(120, 485, 'Waypoint');
+            var waypointUp2 = WaypointUp.create(670, 350, 'Waypoint');
+            var waypointUp3 = WaypointUp.create(120, 250, 'Waypoint');
+
+            WaypointRight = game.add.group();
+
+            WaypointRight.enableBody = true;
+
+            var waypointRight1 = WaypointRight.create(120, 350, 'Waypoint');
+            var waypointRight2 = WaypointRight.create(120, 115, 'Waypoint');
+
+            WaypointLeft = game.add.group();
+
+            WaypointLeft.enableBody = true;
+
+            var waypointLeft1 = WaypointLeft.create(670, 250, 'Waypoint');
+
+            // Mobs
+            Mobs = game.add.group();
+
+            game.physics.arcade.enable(Mobs);
+
+            Mobs.enableBody = true;
+
+            // Towers
+            Towers = game.add.group();
+
+            tower1 = Towers.create(400, 300, 'Tower1');
+
+            // Startbutton
+            Startbutton = game.add.button(360, 40, 'Startbutton', actionOnClick, this, 2, 1, 0);
+
+            // Lifes
+            Lifes = game.add.group();
+
+            for (bf = 0; bf < 10; bf++) {
+                Lifes.create(330 + 40 * bf, 185, "Life").scale.setTo(0.1);
+            }
+
+            game.add.text(255, 200, 'Lifes:', { fontSize: '32px', fill: '#FFF' });
+
+            bflost = game.add.image(game.world.centerX - 213, game.world.centerY - 284, 'bflost');
+            bflost.scale.setTo(0);
+
+            gameLost = game.add.text(270, 50, 'Verloren :\'(', { font: '50pt Arial', fill: '#FFF' });
+            gameLost.visible = false;
+            // bullet
+            bullets = game.add.group();
+            bullets.enableBody = true;
+            bullets.physicsBodyType = Phaser.Physics.ARCADE;
+
+            bullets.createMultiple(50, 'bullet');
+            bullets.setAll('checkWorldBounds', true);
+            bullets.setAll('outOfBoundsKill', true);
+
+            //Sounds
+            explosion = game.add.audio('Explosion');
+            towershot = game.add.audio('Towershot');
+        }
+
+        function update() {
+            Mobs.forEach(function (mob) {
+                game.physics.arcade.overlap(mob, WaypointUp, turnUp, null, this);
+                game.physics.arcade.overlap(mob, WaypointLeft, turnLeft, null, this);
+                game.physics.arcade.overlap(mob, WaypointRight, turnRight, null, this);
+                game.physics.arcade.overlap(mob, goal, deductLife, null, this);
+                game.physics.arcade.overlap(mob, bullets, damage, null, this);
+                
+            }, this);
+             if (game.input.activePointer.isDown)
+            {
+            fire();
+            }
+        }
+
+        function turnUp(mob, WaypointUp) {
+            mob.body.velocity.y = -100;
+            mob.body.velocity.x = 0;
+        }
+
+        function turnLeft(mob, WaypointUp) {
+            mob.body.velocity.y = 0;
+            mob.body.velocity.x = -100;
+        }
+
+        function turnRight(mob, WaypointUp) {
+            mob.body.velocity.y = 0;
+            mob.body.velocity.x = 100;
+        }
+
+        function deductLife(mob, goal) {
+            Mobs.remove(mob);
+            var tempLife = Lifes.getFirstExists();
+            game.add.tween(tempLife.scale).to({ x: 0, y: 0 }, 200, Phaser.Easing.Linear.None, true);
+            game.time.events.add(200, function () {
+                Lifes.remove(tempLife);
+                if (Lifes.total == 0) {
+                    gameLost.visible = true;
+                    game.add.tween(bflost.scale).to({ x: 1, y: 1 }, 500, Phaser.Easing.Linear.None, true);
+                }
+            }, this);
+        }
+
+        // Buttonfunctionn
+        function actionOnClick() {
+            for (i = 0; i < 10; i++) {
+                //for (i = 1; i < 10; i++) {
+                //moblist[i] = i;
+                game.time.events.add(Phaser.Timer.SECOND * 0.5 * i, spawnMob, this);
+            }
+
+        }
+
+        function spawnMob() {
+            var tempMob = Mobs.create(680, 490, 'Red');
+            tempMob.body.gravity.y = 0;
+            tempMob.body.velocity.x = -200;
+            tempMob.health = 3;
+        }
+
+        // Damage
+        function damage(tempMob, bullet) {
+            if (tempMob.health > 1) {
+            bullet.kill();
+           tempMob.health = tempMob.health-1;
+            } else {
+                tempMob.kill();
+                explosion.play();
+                bullet.kill();
+                score += 10;
+                scoreText.text = 'Score: ' +  score;
+            }
+            
+        }
+        
+        //Fire
+        function fire() {
+            if (game.time.now > nextFire && bullets.countDead() > 0)
+    {
+        nextFire = game.time.now + fireRate;
+
+        var bullet = bullets.getFirstDead();
+
+        bullet.reset(tower1.x, tower1.y);
+
+        game.physics.arcade.moveToPointer(bullet, 300);
+
+        towershot.play();
+    }
+        }
+    </script>
+
+</body>
+
+</html>
