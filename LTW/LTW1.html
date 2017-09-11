@@ -33,6 +33,7 @@
             game.load.image('Life', 'assets/Life.png');
             game.load.image('bflost', 'assets/bflost.png');
             game.load.image('bullet', 'assets/bullet.png');
+            game.load.image('Ende', 'assets/Ende.png');
 
             game.load.audio('Explosion', 'assets/Explosion.mp3');
             game.load.audio('Towershot', 'assets/Towershot.mp3');
@@ -148,6 +149,9 @@
             // Startbutton
             Startbutton = game.add.button(360, 40, 'Startbutton', actionOnClick, this, 2, 1, 0);
 
+            //Endbutton
+            Endbutton = game.add.button(30, 570, 'Ende', actionOnClick, this, 2, 1, 0);
+
             // Lifes
             Lifes = game.add.group();
 
@@ -253,6 +257,7 @@
         
         //Fire
         function fire() {
+            if (Startbutton.input.pointerOver() == false) {
             if (game.time.now > nextFire && bullets.countDead() > 0)
     {
         nextFire = game.time.now + fireRate;
@@ -265,6 +270,11 @@
 
         towershot.play();
     }
+            }
+        }
+        
+        function endGame() {
+    
         }
     </script>
 
