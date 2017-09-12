@@ -1,12 +1,12 @@
-var Ball = {
-	_WIDTH: 320,
-	_HEIGHT: 480
+var Grave = {
+	_WIDTH: 800,
+	_HEIGHT: 600
 };
-Ball.Boot = function(game) {};
-Ball.Boot.prototype = {
+Grave.Boot = function(game) {};
+Grave.Boot.prototype = {
 	preload: function() {
-		this.load.image('preloaderBg', 'img/loading-bg.png');
-		this.load.image('preloaderBar', 'img/loading-bar.png');
+	//	this.load.image('preloaderBg', 'img/loading-bg.png');
+	//	this.load.image('preloaderBar', 'img/loading-bar.png');
 	},
 	create: function() {
 		this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
