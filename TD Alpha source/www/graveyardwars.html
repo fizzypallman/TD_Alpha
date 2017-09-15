@@ -12,11 +12,13 @@
     </style>
     <script src="cordova.js"></script>
     <script src="src/phaser.js"></script>
-    <script src="src/Boot1.js"></script>
-    <script src="src/Preloader1.js"></script>
+    <script src="src/boot.js"></script>
+    <script src="src/preloader.js"></script>
+    <script src="src/menu.js"></script>
+    <script src="src/mainlevel.js"></script>
    <!-- <script src="src/MainMenu.js"></script>
     <script src="src/Howto.js"></script> -->
-    <script src="src/Game1.js"></script>
+    <script src="src/game.js"></script>
 </head>
 
 <body>
@@ -30,9 +32,10 @@
         var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'game');
         game.state.add('Boot', Grave.Boot);
         game.state.add('Preloader', Grave.Preloader);
-       // game.state.add('MainMenu', Ball.MainMenu);
+        game.state.add('Menu', Grave.Menu);
       //  game.state.add('Howto', Ball.Howto);
         game.state.add('Game', Grave.Game);
+        game.state.add('Mainlevel', Grave.Mainlevel);
         game.state.start('Boot');
     })();
     </script>

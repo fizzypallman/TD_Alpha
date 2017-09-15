@@ -14,71 +14,32 @@
     var scoreText;
     var explosion;
     var towershot;
-    var waypointUp;
-    var waypointRight;
-    var waypointLeft;
+    var WaypointUp;
+    var WaypointRight;
+    var WaypointLeft;
 
 // State-Definition
 Grave.Game = function(game) {};
 Grave.Game.prototype = {
+
 // Definition of game-functions
 	create: function() {
 
     this.physics.startSystem(Phaser.Physics.ARCADE);
 
-    // Background
-    this.add.sprite(0, 0, 'Background');
 
-    //  The score
-    scoreText = this.add.text(32, 29, 'Test', { fontSize: '32px', fill: '#00FF00' });
-
-    // Walls & Ground
-    Walls = this.add.group();
-    Walls.enableBody = true;
-    // Ground
-    var ground = Walls.create(0, this.world.height - 32, 'Ground');
-    ground.scale.setTo(2, 2);
-
-    // Ceiling
-    var ceiling = Walls.create(0, 0, 'Ground');
-    ceiling.scale.setTo(2, 1);
-
-    //Sidewalls
-    var sidewalls = Walls.create(770, 0, 'Wall');
-    sidewalls.scale.setTo(1, 2);
-    sidewalls = Walls.create(0, 0, 'Wall');
-    sidewalls.scale.setTo(1, 2);
-
-    //Midwalls
-    var midwall = Walls.create(250, 400, 'Ground');
-    midwall.scale.setTo(1.5, 1)
-    midwall = Walls.create(0, 300, 'Ground');
-    midwall.scale.setTo(1.5, 1);
-    midwall = Walls.create(250, 200, 'Ground');
-    midwall.scale.setTo(1.5, 1);
-
-    //StartGoal and Startline
-    StartGoal = this.add.group();
-    StartGoal.enableBody = true;
-    goal = StartGoal.create(700, 80, 'StartGoal');
-    start = StartGoal.create(700, 470, 'StartGoal');
-
-    //Waypoints
-
-    WaypointUp = this.add.group();
-    WaypointUp.enableBody = true;
-    var waypointUp1 = WaypointUp.create(120, 485, 'Waypoint');
-    var waypointUp2 = WaypointUp.create(670, 350, 'Waypoint');
-    var waypointUp3 = WaypointUp.create(120, 250, 'Waypoint');
-
-    WaypointRight = this.add.group();
-    WaypointRight.enableBody = true;
-    var waypointRight1 = WaypointRight.create(120, 350, 'Waypoint');
-    var waypointRight2 = WaypointRight.create(120, 115, 'Waypoint');
-
-    WaypointLeft = this.add.group();
-    WaypointLeft.enableBody = true;
-    var waypointLeft1 = WaypointLeft.create(670, 250, 'Waypoint');
+    // Tutorial - Level!
+this.add.sprite(0, 0, 'Background');
+Walls = this.add.group();
+Walls.enableBody = true;
+StartGoal = this.add.group();
+StartGoal.enableBody = true;
+WaypointUp = this.add.group();
+WaypointUp.enableBody = true;
+WaypointRight = this.add.group();
+WaypointRight.enableBody = true;
+WaypointLeft = this.add.group();
+WaypointLeft.enableBody = true;
 
     // Mobs
     Mobs = this.add.group();
@@ -118,6 +79,49 @@ Grave.Game.prototype = {
     //Sounds
     explosion = this.add.audio('Explosion');
     towershot = this.add.audio('Towershot');
+
+    this.tutorialLvl();
+
+},
+
+tutorialLvl: function() {
+
+    scoreText = this.add.text(32, 29, 'Erreiche 100 Punkte!', { fontSize: '32px', fill: '#00FF00' })
+     // Ground
+     var ground = Walls.create(0, this.world.height - 32, 'Ground');
+     ground.scale.setTo(2, 2);
+     // Ceiling
+     var ceiling = Walls.create(0, 0, 'Ground');
+     ceiling.scale.setTo(2, 1);
+ 
+     //Sidewalls
+     var sidewalls = Walls.create(770, 0, 'Wall');
+     sidewalls.scale.setTo(1, 2);
+     sidewalls = Walls.create(0, 0, 'Wall');
+     sidewalls.scale.setTo(1, 2);
+ 
+     //Midwalls
+     var midwall = Walls.create(250, 400, 'Ground');
+     midwall.scale.setTo(1.5, 1)
+     midwall = Walls.create(0, 300, 'Ground');
+     midwall.scale.setTo(1.5, 1);
+     midwall = Walls.create(250, 200, 'Ground');
+     midwall.scale.setTo(1.5, 1);
+
+    goal = StartGoal.create(700, 80, 'StartGoal');
+    start = StartGoal.create(700, 470, 'StartGoal');
+    //Waypoints
+    WaypointUp.create(120, 485, 'Waypoint');
+    WaypointUp.create(670, 350, 'Waypoint');
+    WaypointUp.create(120, 250, 'Waypoint');
+    WaypointRight.create(120, 350, 'Waypoint');
+    WaypointRight.create(120, 115, 'Waypoint');
+    WaypointLeft.create(670, 250, 'Waypoint');
+
+},
+
+mainLevel: function() {
+
 },
 
 update: function() {
@@ -191,6 +195,9 @@ damage: function (tempMob, bullet) {
         bullet.kill();
         score += 10;
         scoreText.text = 'Score: ' +  score;
+        if (score == 100) {
+            this.game.state.start('Mainlevel');
+        }
     }
     
 },
